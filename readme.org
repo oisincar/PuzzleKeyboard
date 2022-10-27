@@ -1,0 +1,6 @@
+#+TITLE: Puzzle Acrylic Keyboard
+
+Puzzle is a split keyboard, that can fit together to use as a regular 60% keyboard. It's designed to be cut out of 5 layers of acrylic, which then stack together. Currently there is no PCB, and it must be hand-soldered.
+
+* Firmware
+The QMK firmware is in /puzzle_qmk. See the readme there for information on flashing it.
