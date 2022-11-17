@@ -41,6 +41,9 @@ class Config {
         // Offsets between rows along right edge of left piece...
         this.edge_offsets = [-0.5, 0.25, -0.5, 0.5];
 
+        // The full screw_padding square width, on hollow layers.
+        this.screw_square = this.screw_size_small + 2 * this.screw_padding;
+
         this.create_extra_layer = true;
 
         this.board_offset_padding_external = 4;
@@ -48,11 +51,18 @@ class Config {
         this.board_offset_padding_y = 4;
     }
 
+    update() {
+        this.board_padding = this.hole_gap;
+        this.board_top_padding = this.board_padding;
+        this.screw_padding = this.hole_gap;
+        this.screw_square = this.screw_size_small + 2 * this.screw_padding;
+    }
+
     get hole_gap() {
         return this.u - this.hole_width;
     }
 
-    get kerf2() { return 0.5 * kerf; }
+    get kerf2() { return 0.5 * this.kerf; }
     get board_height() {
         return this.board_key_height * this.u - this.hole_gap +
             2 * this.board_padding + this.board_top_padding; // Second is for holes at top
@@ -74,10 +84,6 @@ class Config {
         return this.edge_offsets.map(x => -x).reverse();
     }
 
-    // The full screw_padding square width
-    get screw_square() {
-        return this.screw_size_small + 2 * this.screw_padding;
-    }
     get screw_square2() {
         return 0.5 * this.screw_square;
     }
@@ -308,12 +314,9 @@ function get_layer(top_length_left, top_length_right, is_left, connected) {
     text += "      Z\" />\n";
     var radius = 0.5 * (c.screw_size_big) - c.kerf2;
     text += screwHoles(is_left, radius, true);
-    // text += `    <circle cx="${c.screw_square2}" cy="${c.screw_square2}" r="${radius}" />\n`;
-    // text += `    <circle cx="${c.screw_square2}" cy="${c.board_height-c.screw_square2}" r="${radius}" />\n`;
-    // text += `    <circle cx="${c.board_width-c.screw_square2}" cy="${c.board_height-c.screw_square2}" r="${radius}" />\n`;
-    // text += `    <circle cx="${c.board_width-c.screw_square2}" cy="${screw_top_right+c.screw_square2}" r="${radius}" />\n`;
     return text;
 }
+
 function drawHex(x, y, r) {
     var a = 0;
     var text = '';
@@ -325,6 +328,7 @@ function drawHex(x, y, r) {
     text += "Z\" />\n";
     return text;
 }
+
 function screwHoles(is_left, radius, is_hex) {
     if (is_hex === void 0) { is_hex = false; }
     // Hole cols
@@ -358,7 +362,7 @@ function getLineFromOffsets(offsets, is_up) {
     var y_sign = 1;
     if (is_up)
         y_sign = -1;
-    var board_outline = "v " + y_sign * (c.u + c.hole_gap / 2) + "\n";
+    var board_outline = "v " + y_sign * (c.kerf2 + c.u + c.hole_gap / 2) + "\n";
     // Going down, gotta add in hole spacing at top
     if (!is_up)
         board_outline += "v " + c.board_top_padding + "\n";
@@ -369,6 +373,9 @@ function getLineFromOffsets(offsets, is_up) {
     board_outline += "v " + y_sign * c.hole_gap / 2 + "\n";
     if (is_up)
         board_outline += "v " + -c.board_top_padding + "\n";
+
+
+    board_outline += "v " + y_sign * c.kerf2 + "\n";
     return board_outline;
 }
 function getSvg(keyboardName, layoutText, svgPos) {
@@ -384,7 +391,12 @@ function getSvg(keyboardName, layoutText, svgPos) {
     board_outline += "    <path d=\"\n";
     // Top corner/ right side of board
     if (is_left) {
-        board_outline += "       M " + (c.board_width - c.corner_radius - c.hole_gap / 2 - c.board_padding) + " " + -c.kerf2 + "\n";
+        // Find how many keys in top row
+        var numKeys = layout[0].length + layout[0][0].x;
+        var startX = c.u * numKeys - (c.u - c.hole_width)*0.5;
+
+        // board_outline += "       M " + (c.board_width - c.corner_radius - c.hole_gap / 2 - c.board_padding) + " " + -c.kerf2 + "\n";
+        board_outline += "       M " + (startX) + " " + -c.kerf2 + "\n";
         board_outline += getLineFromOffsets(c.left_edge_offsets, false);
     }
     else {
@@ -395,7 +407,7 @@ function getSvg(keyboardName, layoutText, svgPos) {
     }
     // Bottom / Left side of board
     if (!is_left) {
-        board_outline += "H " + (c.corner_radius + 0.375 * c.u) + "\n";
+        board_outline += "H " + (+0.75*c.u + c.kerf2 - (c.u - c.hole_width)*0.5) + "\n";
         board_outline += getLineFromOffsets(c.right_edge_offsets, true);
     }
     else {
