@@ -2,22 +2,41 @@
 
 
 class Config {
-    constructor() {
 
-        this.left_text =
-`[{x:0.5},"¬\\nEsc\\n\\n\\n\\n\\n\`","!\\n1","\\"\\n2","£\\n3","$\\n4","%\\n5","^\\n6"],
+    update_params_for_b_key(key_on_left) {
+        this.b_key_on_right = key_on_left;
+
+        if (this.b_key_on_right) {
+            this.left_text = `[{x:0.5},"¬\\nEsc\\n\\n\\n\\n\\n\`","!\\n1","\\"\\n2","£\\n3","$\\n4","%\\n5","^\\n6"],
 [{x:1},"Tab","Q","W","E","R","T"],
 [{x:0.25,a:7},"",{a:4},"Caps Lock","A","S","D","F","G"],
 [{x:0.75},"Shift","|\\n\\\\","Z","X","C","V"],
 [{x:0.5,w:1.25},"Ctrl",{a:7,w:1.25},"",{a:4,w:1.25},"Super",{w:1.25},"Alt",{a:7,w:1.75},""]`;
-
-        this.right_text =
-`[{x:0.75},"&\\n7","*\\n8","(\\n9",")\\n0","_\\n-","+\\n=","⌫"],
+            this.right_text = `[{x:0.75},"&\\n7","*\\n8","(\\n9",")\\n0","_\\n-","+\\n=","⌫"],
 [{x:0.25},"Y","U","I","O","P","{\\n[","}\\n]"],
 [{x:0.5},"H","J","K","L",":\\n;","@\\n'","~\\nEnter\\n\\n\\n\\n\\n#"],
 ["B","N","M","<\\n,",">\\n.","?\\n/","Shift"],
 [{x:0.5,a:7,w:1.75},"",{a:4,w:1.25},"Alt",{a:7,w:1.25},"",{w:1.25},"",{a:4,w:1.25},"Ctrl"]`;
+            // Offsets between rows along right edge of left piece...
+            this.edge_offsets = [-0.5, 0.25, -0.5, 0.5];
+        }
+        else {
+            this.left_text = `[{x:0.5},"¬\\nEsc\\n\\n\\n\\n\\n\`","!\\n1","\\"\\n2","£\\n3","$\\n4","%\\n5","^\\n6"],
+[{x:1},"Tab","Q","W","E","R","T"],
+[{x:0.25,a:7},"",{a:4},"Caps Lock","A","S","D","F","G"],
+[{x:0.75},"Shift","|\\n\\\\","Z","X","C","V","B"],
+[{x:0.5,w:1.25},"Ctrl",{a:7,w:1.25},"",{a:4,w:1.25},"Super",{w:1.25},"Alt",{a:7,w:1.75},""]`;
+            this.right_text = `[{x:0.75},"&\\n7","*\\n8","(\\n9",")\\n0","_\\n-","+\\n=","⌫"],
+[{x:0.25},"Y","U","I","O","P","{\\n[","}\\n]"],
+[{x:0.5},"H","J","K","L",":\\n;","@\\n'","~\\nEnter\\n\\n\\n\\n\\n#"],
+[{x:1.0},"N","M","<\\n,",">\\n.","?\\n/","Shift"],
+[{x:0.5,a:7,w:1.75},"",{a:4,w:1.25},"Alt",{a:7,w:1.25},"",{w:1.25},"",{a:4,w:1.25},"Ctrl"]`;
+            this.edge_offsets = [-0.5, 0.25, 0.5, -0.5];
+        }
+    }
 
+    constructor() {
+        this.update_params_for_b_key(true);
 
         this.u = 19.05;
         this.hole_width = 14;
@@ -37,9 +56,6 @@ class Config {
         // spacer >= 3.3
         this.screw_size_big = 3.3;
         this.screw_padding = this.hole_gap;
-
-        // Offsets between rows along right edge of left piece...
-        this.edge_offsets = [-0.5, 0.25, -0.5, 0.5];
 
         // The full screw_padding square width, on hollow layers.
         this.screw_square = this.screw_size_small + 2 * this.screw_padding;
